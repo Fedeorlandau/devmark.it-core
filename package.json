@@ -1,0 +1,50 @@
+{
+    "private": true,
+    "name": "devmark",
+    "license": "MIT",
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "dev": "yarn turbo run dev",
+        "bootstrap": "rimraf node_modules && yarn"
+    },
+    "devDependencies": {
+        "concurrently": "^6.4.0",
+        "rimraf": "^3.0.2"
+    },
+    "dependencies": {
+        "@nestjs/cli": "^8.1.5",
+        "turbo": "^1.0.6"
+    },
+    "turbo": {
+        "baseBranch": "origin/main",
+        "pipeline": {
+            "build": {
+                "dependsOn": ["^build"],
+                "outputs": [".vercel_build_output/**", ".svelte-kit/**", "dist/**"],
+                "cache": false
+            },
+            "test": {
+                "dependsOn": ["^build"],
+                "outputs": []
+            },
+            "lint": {
+                "outputs": []
+            },
+            "dev": {
+                "cache": false
+            },
+            "prod": {
+                "dependsOn": ["build"],
+                "outputs": []
+            },
+            "frontend#deploy": {
+                "dependsOn": ["frontend#build"]
+            },
+            "backend#deploy": {
+                "dependsOn": ["backend#prod"]
+            }
+        }
+    }   
+}

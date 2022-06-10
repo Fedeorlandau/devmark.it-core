@@ -1,0 +1,1 @@
+web: yarn turbo run backend#deploy

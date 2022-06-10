@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ql-toolbar.ql-snow {
+  @apply bg-gray-800 border-0 rounded-t;
+}
+
+.ql-stroke {
+  stroke: white !important;
+}
+.ql-fill {
+  fill: white !important;
+}
+
+.ql-picker-label {
+  @apply text-white;
+}
