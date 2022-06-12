@@ -7,6 +7,7 @@
   import { variables } from "@lib/variables";
   import Button from "@ui/Button.svelte";
   import Select from "@ui/Select.svelte";
+  import Badge from "@ui/Badge.svelte";
 
   const colors = new TailwindColor("#f00");
   let roomId;
@@ -22,7 +23,7 @@
       values: [],
     },
     members: [],
-    membersNames: [],
+    membersInfo: [],
     selectedOptions: [],
     revealed: false,
   };
@@ -46,7 +47,6 @@
     });
 
     socket.on("joined", function (data) {
-      console.log({ data });
       joined = true;
     });
 
@@ -63,9 +63,9 @@
   });
 
   $: options = room.options;
-  $: selectedEstimates = room.selectedOptions;
+  $: selectedEstimates = room.selectedOptions.sort((a, b) => a.value - b.value);
   $: members = room.members;
-  $: membersNames = room.membersNames;
+  $: membersInfo = room.membersInfo;
   $: revealed = room.revealed;
   $: owner = socket && socket.id === room.owner;
   $: missingOptions = members.length - selectedEstimates.length;
@@ -266,12 +266,17 @@
       </div>
       <div class="my-6">
         <h2 class="text-xl md:text-3xl text-white font-bold leading-tight">
-          Team members ({membersNames.length})
+          Team members ({membersInfo.length})
         </h2>
         <ul class="flex py-4 pl-2 flex-col text-white list-disc ml-3">
-          {#each membersNames as member}
+          {#each membersInfo as { voted, name }}
             <li>
-              {member.name}
+              <p>
+                {name} -
+                <Badge type={voted ? "success" : "warning"}
+                  >{voted ? "Voted" : "Pending"}</Badge
+                >
+              </p>
             </li>
           {/each}
         </ul>
