@@ -109,7 +109,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         options: optionPacks[0],
         selectedOptions: [],
         members: [client.id],
-        membersNames: [],
+        membersInfo: [],
         hash: id,
         revealed: false,
         createdAt: new Date(),
@@ -126,6 +126,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         status: "updated",
         revealed: false,
         selectedOptions: [],
+        membersInfo: room.membersInfo.map((member) => ({
+          ...member,
+          voted: false,
+        })),
       };
       this.roomService.update(updatedRoom);
       this.broadcastRoomUpdate(updatedRoom);
@@ -145,6 +149,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
             value: option,
           },
         ],
+        membersInfo: room.membersInfo.map((member) => {
+          if (member.clientId === client.id) {
+            return {
+              ...member,
+              voted: true,
+            };
+          }
+          return member;
+        }),
       };
       this.roomService.update(updatedRoom);
       this.broadcastRoomUpdate(updatedRoom);
@@ -182,8 +195,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (room) {
       const updatedRoom = {
         ...room,
-        membersNames: [
-          ...room.membersNames,
+        membersInfo: [
+          ...room.membersInfo,
           {
             clientId: client.id,
             name,
@@ -191,7 +204,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         ],
       };
       this.roomService.update(updatedRoom);
-      console.log({ updatedRoom });
       this.server.to(client.id).emit("joined", {
         event: "joined",
         data: { name },
@@ -222,7 +234,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const updatedRoom = {
           ...room,
           members: room.members.filter((member) => member !== client.id),
-          membersNames: room.membersNames.filter(
+          membersInfo: room.membersInfo.filter(
             (member) => member.clientId !== client.id
           ),
         };
