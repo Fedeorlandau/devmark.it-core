@@ -16,7 +16,7 @@ export interface RoomEntity extends InMemoryDBEntity {
     value: number;
   }[];
   members: string[];
-  membersNames: { clientId: string; name: string }[];
+  membersInfo: { clientId: string; name: string; voted?: boolean }[];
   revealed: boolean;
   createdAt: Date;
 }
