@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { io } from "socket.io-client";
   import { fade } from "svelte/transition";
   import { page } from "$app/stores";
   import { TailwindColor } from "@utils/color";
   import { onMount, onDestroy } from "svelte";
-  import { variables } from "@lib/variables";
   import Button from "@ui/Button.svelte";
   import Select from "@ui/Select.svelte";
+  import initSocket from "@lib/socket";
 
   const colors = new TailwindColor("#f00");
   let roomId;
@@ -27,31 +26,22 @@
   page.subscribe((p) => (roomId = p.params.id));
 
   onMount(() => {
-    socket = io(variables.wsUrl);
-
-    socket.on("connect", function () {
-      socket.emit("events", { type: "join", payload: { id: roomId } });
-      isConnected = true;
-    });
-
-    socket.on("updated", function (event) {
-      room = event.data;
-    });
-
-    socket.on("exception", function (data) {
-      console.log("event", data);
-    });
-
-    socket.on("expire", function () {
-      expired = true;
-      socket.close();
+    socket = initSocket({
+      roomId,
+      onConnect: () => {
+        isConnected = true;
+      },
+      onUpdated: (event) => {
+        room = event.data;
+      },
+      onExpired: () => {
+        expired = true;
+      },
     });
   });
 
   onDestroy(() => {
-    if (socket) {
-      socket.close();
-    }
+    socket?.close();
   });
 
   $: options = room.options;
