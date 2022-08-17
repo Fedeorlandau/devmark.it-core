@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io-client";
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createMemo, createSignal, onCleanup, onMount, Owner } from "solid-js";
 import initSocket from "../utils/socket";
 
 const defaultRoom = {
@@ -22,16 +22,36 @@ export default function Room({ roomId }: { roomId: string }) {
   const [expired, setExpired] = createSignal(false);
   const [room, setRoom] = createSignal(defaultRoom);
   const [name, setName] = createSignal("");
+  const [voted, setVoted] = createSignal(false);
+
+  let owner = createMemo(() => {
+    return socket()?.id === room().owner;
+  });
+
+  let selectedEstimates = createMemo(() => {
+    return room()?.selectedOptions.sort((a, b) => a.value - b.value);
+  });
+
+  let missingOptions = createMemo(() => {
+    return room().members.length - room()?.selectedOptions.length;
+  });
+
+  let average = createMemo(() => {
+    return room()?.selectedOptions.length
+      ? (
+          room()?.selectedOptions.reduce((a, b) => a + b.value, 0) /
+          room()?.selectedOptions.length
+        ).toFixed(2)
+      : 0;
+  });
 
   onMount(() => {
-    console.log("mounting");
     const s = initSocket({
       roomId,
       onConnect: () => {
         setIsConnected(true);
       },
       onUpdated: (event) => {
-        console.log(event.data);
         setRoom(event.data);
       },
       onJoined: () => {
@@ -53,6 +73,24 @@ export default function Room({ roomId }: { roomId: string }) {
       type: "update_name",
       payload: { id: roomId, name: name() },
     });
+  };
+
+  let vote = (option: number) => {
+    setVoted(true);
+    socket()?.emit("events", { type: "vote", payload: { id: roomId, option } });
+  };
+
+  let share = () => {
+    navigator.clipboard.writeText(window.location.href);
+  };
+
+  let reset = () => {
+    socket()?.emit("events", { type: "reset", payload: { id: roomId } });
+    setVoted(false);
+  };
+
+  let toggleRevealed = () => {
+    socket()?.emit("events", { type: "reveal", payload: { id: roomId } });
   };
 
   return (
@@ -116,6 +154,103 @@ export default function Room({ roomId }: { roomId: string }) {
             </div>
           </div>
         </div>
+      )}
+
+      {isConnected() && (
+        <>
+          <div class="flex flex-col md:flex-row">
+            <div class="w-full max-w-md">
+              <div class="flex items-center">
+                <h1 class="text-md text-white leading-tight inline-block">
+                  Welcome {name} to your room.
+                </h1>
+                <button
+                  class="p-0 leading-none ml-1 inline-block underline decoration-purple-500 decoration-2 text-white font-bold underline-offset-2"
+                  onclick={() => share()}
+                >
+                  Copy link to clipboard
+                </button>
+              </div>
+              <h2 class="my-4 text-xl md:text-3xl text-white font-bold leading-tight">
+                Select your estimate
+              </h2>
+
+              <div class="grid grid-cols-1 divide-y space-y-8 divide-white max-w-md">
+                <div class={`${voted() ? "opacity-75" : ""}`}>
+                  {room().options.values.map((option) => (
+                    <button
+                      onClick={() => vote(option)}
+                      class="bg-white m-1 text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500 hover:to-red-400 hover:via-red-400 text-white"
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+
+                {owner() && (
+                  <div class="pt-6 flex">
+                    <button
+                      onClick={reset}
+                      class="m-1 text-md py-1 px-4 rounded-md ring-1 ring-purple-600 bg-purple-500 hover:bg-purple-600 text-white"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      onClick={toggleRevealed}
+                      disabled={selectedEstimates().length === 0}
+                      class={`${
+                        !selectedEstimates().length
+                          ? "opacity-75 cursor-not-allowed"
+                          : ""
+                      } m-1 text-md py-1 px-4 rounded-md ring-1 ring-pink-400 bg-pink-500 hover:bg-pink-700 text-white`}
+                    >
+                      {room().revealed ? "Hide" : "Reveal"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div class="flex-grow-0 md:px-4 md:mx-16 max-w-lg">
+              <h2 class="my-4 text-xl md:text-3xl text-white font-bold leading-tight">
+                Team estimates
+              </h2>
+              <div
+                class={`flex flex-wrap ${!room().revealed ? "opacity-75" : ""}`}
+              >
+                {selectedEstimates().map((estimate) => (
+                  <div class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500  text-white">
+                    {room().revealed ? estimate.value : "?"}
+                  </div>
+                ))}
+
+                {missingOptions() > 0 &&
+                  [...Array(missingOptions()).keys()].map((missingEstimate) => {
+                    return (
+                      <div class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md border-2 border-purple-400 border-dashed 0  text-white" />
+                    );
+                  })}
+              </div>
+              <p class="mt-4 text-white font-bold">
+                Average: {room().revealed ? average : "?"}
+              </p>
+            </div>
+          </div>
+          <div class="my-6">
+            <h2 class="text-xl md:text-3xl text-white font-bold leading-tight">
+              Team members ({room().membersInfo.length})
+            </h2>
+            <ul class="flex py-4 pl-2 flex-col text-white list-disc ml-3">
+              {room().membersInfo.map((member) => (
+                <li>
+                  <p>
+                    {member.name} - {member.voted ? "Voted" : "Pending"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
     </div>
   );
