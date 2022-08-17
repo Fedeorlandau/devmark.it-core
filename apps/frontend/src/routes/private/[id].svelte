@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Socket } from "socket.io-client";
   import { fade } from "svelte/transition";
   import { page } from "$app/stores";
   import { TailwindColor } from "@utils/color";
@@ -9,8 +10,10 @@
 
   const colors = new TailwindColor("#f00");
   let roomId;
-  let socket;
+  let socket: Socket;
   let isConnected = false;
+  let voted = false;
+  let expired = false;
   let room = {
     owner: "",
     options: {
@@ -22,7 +25,7 @@
     selectedOptions: [],
     revealed: false,
   };
-  let expired = false;
+
   page.subscribe((p) => (roomId = p.params.id));
 
   onMount(() => {
@@ -44,21 +47,15 @@
     socket?.close();
   });
 
-  $: options = room.options;
   $: selectedEstimates = room.selectedOptions;
-  $: members = room.members;
-  $: revealed = room.revealed;
-  $: owner = socket && socket.id === room.owner;
-  $: missingOptions = members.length - selectedEstimates.length;
-  $: selectedOption = room.options.label;
-
   $: average = selectedEstimates.length
     ? (
         selectedEstimates.reduce((a, b) => a + b.value, 0) /
         selectedEstimates.length
       ).toFixed(2)
     : 0;
-  let voted = false;
+  $: owner = socket && socket.id === room.owner;
+  $: missingOptions = room.members.length - selectedEstimates.length;
 
   let toggleRevealed = () => {
     socket.emit("events", { type: "reveal", payload: { id: roomId } });
@@ -129,7 +126,7 @@
             class="grid grid-cols-1 divide-y space-y-8 divide-white max-w-md"
           >
             <div class={`${voted ? "opacity-75" : ""}`}>
-              {#each options.values as option}
+              {#each room.options.values as option}
                 <button
                   on:click={() => vote(option)}
                   class="
@@ -154,9 +151,12 @@
                       ? "opacity-75 cursor-not-allowed"
                       : ""
                   } m-1 text-md py-1 px-4 rounded-md ring-1 ring-pink-400 bg-pink-500 hover:bg-pink-700 text-white`}
-                  >{revealed ? "Hide" : "Reveal"}</button
+                  >{room.revealed ? "Hide" : "Reveal"}</button
                 >
-                <Select {selectedOption} onSelected={selectOption} />
+                <Select
+                  selectedOption={room.options.label}
+                  onSelected={selectOption}
+                />
               </div>
             {/if}
           </div>
@@ -168,12 +168,12 @@
           >
             Team estimates
           </h2>
-          <div class={`flex flex-wrap ${!revealed ? "opacity-75" : ""}`}>
+          <div class={`flex flex-wrap ${!room.revealed ? "opacity-75" : ""}`}>
             {#each selectedEstimates as estimate}
               <div
                 class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500  text-white"
               >
-                {revealed ? estimate.value : "?"}
+                {room.revealed ? estimate.value : "?"}
               </div>
             {/each}
 
@@ -186,16 +186,16 @@
             {/if}
           </div>
           <p class="mt-4 text-white font-bold">
-            Average: {revealed ? average : "?"}
+            Average: {room.revealed ? average : "?"}
           </p>
         </div>
       </div>
       <div class="my-6">
         <h2 class="text-xl md:text-3xl text-white font-bold leading-tight">
-          Team members ({members.length})
+          Team members ({room.members.length})
         </h2>
         <div class="flex -space-x-4 overflow-hidden py-4 pl-2 -ml-3">
-          {#each members as member}
+          {#each room.members as member}
             <div
               class={`m-1 border border-white w-12 h-12 relative flex justify-center items-center rounded-full ${colors.pick()} text-xl text-white uppercase`}
             >

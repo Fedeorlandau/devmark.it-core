@@ -13,6 +13,7 @@
   let isConnected = false;
   let joined = false;
   let expired = false;
+  let voted = false;
   let room = {
     owner: "",
     options: {
@@ -26,7 +27,6 @@
     revealed: false,
   };
   let name = "";
-  let voted = false;
 
   page.subscribe((p) => (roomId = p.params.id));
 
