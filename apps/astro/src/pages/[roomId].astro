@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Room from '../components/Room';
+
+const { roomId } = Astro.params;
+---
+
+<Layout>
+    {roomId ?
+    <Room roomId={roomId} client:load /> : <div>No room id</div>}
+</Layout>
