@@ -1,6 +1,5 @@
 import preprocess from "svelte-preprocess";
 import vercel from "@sveltejs/adapter-vercel";
-import path from "path";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -11,15 +10,6 @@ const config = {
   }),
   kit: {
     adapter: vercel(),
-    vite: {
-      resolve: {
-        alias: {
-          "@ui": path.resolve("./src/ui"),
-          "@utils": path.resolve("./src/utils"),
-          "@lib": path.resolve("./src/lib"),
-        },
-      },
-    },
   },
 };
 
