@@ -1,0 +1,44 @@
+{
+  "baseBranch": "origin/main",
+  "pipeline": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".vercel_build_output/**",
+        ".svelte-kit/**",
+        "dist/**"
+      ],
+      "cache": false
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false
+    },
+    "prod": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": []
+    },
+    "frontend#deploy": {
+      "dependsOn": [
+        "frontend#build"
+      ]
+    },
+    "backend#deploy": {
+      "dependsOn": [
+        "backend#prod"
+      ]
+    }
+  }
+}
