@@ -237,6 +237,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           membersInfo: room.membersInfo.filter(
             (member) => member.clientId !== client.id
           ),
+          selectedOptions: [
+            ...room.selectedOptions.filter((option) => option.id !== client.id),
+          ],
         };
         this.roomService.update(updatedRoom);
         this.broadcastRoomUpdate(updatedRoom);
