@@ -16,7 +16,7 @@ yarn
 ```bash
 yarn dev
 ```
-Open https://localhost:3000
+Open https://localhost:5173
 
 ## Deploy
 ### Frontend
