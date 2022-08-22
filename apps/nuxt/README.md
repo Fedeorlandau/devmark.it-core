@@ -1,42 +1,14 @@
-# Nuxt 3 Minimal Starter
+# Nuxt 3 Integration of Devmark.it
 
-Look at the [nuxt 3 documentation](https://v3.nuxtjs.org) to learn more.
+*This is a frontend integration of the Devmark.it website, made with Nuxt 3. Both front and backend have been done by Federico Orlandau, with the convertion to Nuxt3 by Benjamin Kjær*.
 
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
-# pnpm
-pnpm install --shamefully-hoist
-```
-
-## Development Server
-
-Start the development server on http://localhost:3000
-
+To run the application start the websocket backend
 ```bash
 npm run dev
 ```
 
-## Production
-
-Build the application for production:
-
+To start the frontend go to the nuxt integration and type
 ```bash
-npm run build
+npm install
+npm run dev
 ```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Checkout the [deployment documentation](https://v3.nuxtjs.org/guide/deploy/presets) for more information.
