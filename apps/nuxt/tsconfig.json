@@ -9,6 +9,7 @@
     "@components/*": ["components/*"],
     "@layouts/*": ["layouts/*"],
     "@pages/*": ["pages/*"],
-    "@lib/*": ["lib/*"]
+    "@lib/*": ["lib/*"],
+    "@utils/*": ["utils/*"]
   }
 }

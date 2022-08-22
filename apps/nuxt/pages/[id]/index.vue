@@ -10,24 +10,22 @@
   const expired = useState("expired", () => false);
   const voted = useState("voted", () => false);
 
-  let roomtype = {
-    owner: "",
-    options: {
-      id: 0,
-      label: "Fibonacci",
-      values: [],
-    },
-    members: [],
-    membersInfo: [],
-    selectedOptions: [],
-    revealed: false,
-  };
-
-  const room = useState("room", () => roomtype);
+  const room = useState("room", () => {
+    return {
+      owner: "",
+      options: {
+        id: 0,
+        label: "Fibonacci",
+        values: [],
+      },
+      members: [],
+      membersInfo: [],
+      selectedOptions: [],
+      revealed: false,
+    };
+  });
 
   const name = useState("name", () => "");
-
-  //   page.subscribe((p) => (roomId = p.params.id));
 
   onBeforeMount(() => {
     socket = initSocket({
@@ -108,7 +106,7 @@
   let updateName = () => {
     socket.emit("events", {
       type: "update_name",
-      payload: { id: roomId, name },
+      payload: { id: roomId, name: name.value },
     });
     if (socket && socket.id === room.value.owner) {
       owner.value = true;
@@ -180,7 +178,7 @@
                   <div class="mt-5 sm:mt-6">
                     <button
                       type="button"
-                      @click="() => updateName()"
+                      onclick="() => updateName()"
                       class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
                     >
                       Join the room
