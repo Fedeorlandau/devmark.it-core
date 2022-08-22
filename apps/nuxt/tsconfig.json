@@ -5,10 +5,10 @@
     "jsx": "preserve"
   },
   "baseUrl": ".",
-  "paths": {
-    "@/components/*": "components/*",
-    "@/pages/*": "pages/*",
-    "@/layouts/*": "layouts/*",
-    "@/lib/*": "lib/*"
+  "path": {
+    "@components/*": ["components/*"],
+    "@layouts/*": ["layouts/*"],
+    "@pages/*": ["pages/*"],
+    "@lib/*": ["lib/*"]
   }
 }

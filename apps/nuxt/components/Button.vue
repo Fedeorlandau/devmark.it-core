@@ -1,41 +1,37 @@
-<script lang="ts">
-  export let _class;
-  export let onclick;
-  export let tooltip;
+<script setup lang="ts">
+  interface ButtonProps {
+    _class?: string;
+    onclick?: () => void;
+    tooltip?: string;
+  }
+
+  const ButtonProps = defineProps<ButtonProps>();
+
   let showTooltip = false;
 
-  function click() {
-    if (onclick) {
-      onclick();
-      if (tooltip) {
+  let click = () => {
+    if (ButtonProps.onclick) {
+      ButtonProps.onclick();
+      if (ButtonProps.tooltip) {
         showTooltip = true;
         setTimeout(() => {
           showTooltip = false;
         }, 1000);
       }
     }
-  }
-
-  export default {
-    name: "Button",
-    data() {
-      return {
-        showTooltip,
-        _class,
-      };
-    },
-    methods: {
-      click,
-    },
   };
 </script>
 
 <template>
-  <button :class="_class" @click="click">
-    <slot />
-  </button>
+  <div>
+    <button :class="_class" @click="() => click()">
+      <slot />
+    </button>
 
-  <div v-if="showTooltip" :data-tooltip="tooltip" />
+    <template v-if="showTooltip">
+      <div :data-tooltip="tooltip" />
+    </template>
+  </div>
 </template>
 
 <style>

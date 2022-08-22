@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { variables } from "@/lib/variables";
+import { variables } from "./variables";
 
 interface UseSocketProps {
   roomId: string;
