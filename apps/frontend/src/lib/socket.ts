@@ -29,8 +29,7 @@ export default function initSocket({
     onUpdated?.(event);
   });
 
-  socket.on("exception", function (event) {
-    console.log("event", event);
+  socket.on("exception", function () {
     onException?.();
   });
 

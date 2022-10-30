@@ -193,7 +193,7 @@
                   </button>
                   <Select
                     :selectedOption="room.options.label"
-                    :onSelected="() => selectOption(room.options.label)"
+                    :onSelected="(selectedOption) => selectOption(selectedOption)"
                   />
                 </div>
               </template>

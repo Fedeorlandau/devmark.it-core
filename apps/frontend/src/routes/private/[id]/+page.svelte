@@ -76,7 +76,6 @@
   };
 
   let selectOption = (selectedOption) => {
-    console.log(selectedOption);
     socket.emit("events", {
       type: "options",
       payload: { id: roomId, option: selectedOption },

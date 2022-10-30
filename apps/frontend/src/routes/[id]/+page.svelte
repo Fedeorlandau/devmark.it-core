@@ -30,8 +30,6 @@
 
   page.subscribe((p) => (roomId = p.params.id));
 
-  console.log(page)
-
   onMount(() => {
     socket = initSocket({
       roomId,

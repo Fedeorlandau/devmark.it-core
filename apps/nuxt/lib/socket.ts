@@ -30,7 +30,6 @@ export default function initSocket({
   });
 
   socket.on("exception", function (event) {
-    console.log("event", event);
     onException?.();
   });
 

@@ -7,17 +7,17 @@
   const SelectProps = defineProps<SelectProps>();
 
   const show = useState("show", () => false);
-  let menu; // menu wrapper DOM reference
+  let menu = ref(null); // menu wrapper DOM reference
 
   let selectOption = (id: number) => {
     SelectProps.onSelected(id);
     show.value = false;
   };
 
-  onBeforeMount(() => {
-    const handleOutsideClick = (event) => {
-      console.log(menu);
-      if (show && !menu.contains(event.target)) {
+  onMounted(() => {
+
+    const handleClickOutside = (e) => {
+      if (menu.value && !menu.value.contains(e.target)) {
         show.value = false;
       }
     };
@@ -29,19 +29,19 @@
     };
 
     // add events when element is added to the DOM
-    document.addEventListener("click", handleOutsideClick, false);
+    document.addEventListener("click", handleClickOutside, false);
     document.addEventListener("keyup", handleEscape, false);
 
     // remove events when element is removed from the DOM
     return () => {
-      document.removeEventListener("click", handleOutsideClick, false);
+      document.removeEventListener("click", handleClickOutside, false);
       document.removeEventListener("keyup", handleEscape, false);
     };
   });
 </script>
 
 <template>
-  <div class="relative" bind="menu">
+  <div class="relative" ref="menu">
     <div>
       <button
         @click="() => (show = !show)"
