@@ -1,0 +1,36 @@
+<template>
+  <div
+    class="bg-black leading-normal tracking-normal text-indigo-400 m-6 max-w-screen-xl mx-auto"
+  >
+    <div class="h-full bg-black">
+      <!--Nav-->
+      <div class="w-full container mx-auto px-6 md:px-0">
+        <div class="w-full flex items-center justify-between">
+          <a
+            class="flex items-center text-indigo-400 no-underline hover:no-underline font-bold text-2xl lg:text-4xl"
+            href="/"
+          >
+            <span
+              class="text-transparent bg-gradient-to-r from-red-400 via-pink-500 to-purple-500 bg-clip-text"
+              >Devmark.it</span
+            >
+          </a>
+        </div>
+      </div>
+
+      <!--Main-->
+      <div class="container mt-4 mx-auto">
+        <slot />
+        <!--Footer-->
+        <div class="w-full pt-16 pb-6 text-sm text-center">
+          <a
+            class="text-white no-underline hover:underline"
+            href="https://fedeorlandau.dev"
+            target="blank"
+            >&copy; Federico Orlandau 2021</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
