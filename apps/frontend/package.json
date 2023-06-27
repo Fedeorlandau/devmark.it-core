@@ -36,7 +36,9 @@
   "type": "module",
   "dependencies": {
     "@nestjs/cli": "^9.0.0",
+    "clsx": "^1.2.1",
     "concurrently": "^7.3.0",
+    "tailwind-merge": "^1.13.2",
     "turbo": "^1.0.6"
   }
 }
