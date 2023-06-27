@@ -7,6 +7,10 @@
   import Select from "@ui/Select.svelte";
   import Badge from "@ui/Badge.svelte";
   import initSocket from "@lib/socket";
+  import { cn } from "$lib/utils";
+  import type { Participant } from "src/types/participant";
+  import type { Room } from "src/types/room";
+  import type { Member } from "src/types/member";
 
   let roomId;
   let socket: Socket;
@@ -14,7 +18,7 @@
   let joined = false;
   let expired = false;
   let voted = false;
-  let room = {
+  let room: Room = {
     owner: "",
     options: {
       id: 0,
@@ -26,7 +30,8 @@
     selectedOptions: [],
     revealed: false,
   };
-  let name = "";
+  let name: Member = "";
+  let participantMode: Participant = "Voter";
 
   page.subscribe((p) => (roomId = p.params.id));
 
@@ -52,7 +57,15 @@
     socket?.close();
   });
 
-  $: selectedEstimates = room.selectedOptions.sort((a, b) => a.value - b.value);
+  $: filteredMembers = {
+    ...room,
+    membersInfo: room.membersInfo.filter(
+      (member) => member.participant !== "Spectator"
+    ),
+  };
+  $: selectedEstimates = filteredMembers.selectedOptions.sort(
+    (a, b) => a.value - b.value
+  );
   $: average = selectedEstimates.length
     ? (
         selectedEstimates.reduce((a, b) => a + b.value, 0) /
@@ -60,10 +73,11 @@
       ).toFixed(2)
     : 0;
   $: owner = socket && socket.id === room.owner;
-  $: missingOptions = room.members.length - selectedEstimates.length;
+  $: missingOptions = filteredMembers.membersInfo.length - selectedEstimates.length;
 
   let toggleRevealed = () => {
     socket.emit("events", { type: "reveal", payload: { id: roomId } });
+    console.log(selectedEstimates, filteredMembers);
   };
 
   let reset = () => {
@@ -72,8 +86,10 @@
   };
 
   let vote = (option: number) => {
-    voted = true;
-    socket.emit("events", { type: "vote", payload: { id: roomId, option } });
+    if (participantMode === "Voter") {
+      voted = true;
+      socket.emit("events", { type: "vote", payload: { id: roomId, option } });
+    }
   };
 
   let selectOption = (selectedOption) => {
@@ -86,12 +102,16 @@
   let updateName = () => {
     socket.emit("events", {
       type: "update_name",
-      payload: { id: roomId, name },
+      payload: { id: roomId, name, participant: participantMode },
     });
   };
 
   let share = () => {
     navigator.clipboard.writeText(window.location.href);
+  };
+
+  let updateParticipant = (participant: Participant) => {
+    participantMode = participant;
   };
 </script>
 
@@ -131,7 +151,7 @@
               class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0"
             >
               <div
-                class="relative bg-white rounded-lg p-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-sm sm:w-full sm:p-6"
+                class="relative bg-white rounded-lg p-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 w-full max-w-[400px] sm:max-w-sm sm:w-full sm:p-6"
               >
                 <div>
                   <div class="text-center sm:mt-2">
@@ -157,6 +177,28 @@
                     class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
                     >Join the room</button
                   >
+                  <div
+                    class="flex space-x-2 mt-2 shadow-sm rounded-md border-transparent px-1 py-1 bg-gray-200"
+                  >
+                    <button
+                      on:click={() => updateParticipant("Voter")}
+                      class={cn(
+                        "w-1/2 border rounded-md px-2 py-2 transition-colors duration-200",
+                        participantMode === "Voter"
+                          ? "bg-indigo-600 text-white"
+                          : "text-black"
+                      )}>Voter</button
+                    >
+                    <button
+                      on:click={() => updateParticipant("Spectator")}
+                      class={cn(
+                        "w-1/2 border rounded-md px-2 py-2 transition-colors duration-200",
+                        participantMode === "Spectator"
+                          ? "bg-indigo-600 text-white"
+                          : "text-black"
+                      )}>Spectator</button
+                    >
+                  </div>
                 </div>
               </div>
             </div>
@@ -185,13 +227,16 @@
           <div
             class="grid grid-cols-1 divide-y space-y-8 divide-white max-w-md"
           >
-            <div class={`${voted ? "opacity-75" : ""}`}>
+            <div class={cn(voted ? "opacity-75" : "")}>
               {#each room.options.values as option}
                 <button
                   on:click={() => vote(option)}
-                  class="
-							bg-white m-1 text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500 hover:to-red-400 hover:via-red-400 text-white"
-                  >{option}</button
+                  class={cn(
+                    "bg-white m-1 text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500 text-white",
+                    participantMode === "Spectator"
+                      ? "cursor-not-allowed opacity-75"
+                      : "hover:to-red-400 hover:via-red-400"
+                  )}>{option}</button
                 >
               {/each}
             </div>
@@ -231,7 +276,7 @@
           <div class={`flex flex-wrap ${!room.revealed ? "opacity-75" : ""}`}>
             {#each selectedEstimates as estimate}
               <div
-                class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500  text-white"
+                class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md ring-1 ring-purple-400 bg-gradient-to-b from-red-400 to-pink-500 text-white"
               >
                 {room.revealed ? estimate.value : "?"}
               </div>
@@ -240,7 +285,7 @@
             {#if missingOptions > 0}
               {#each [...Array(missingOptions).keys()] as missingEstimate}
                 <div
-                  class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md border-2 border-purple-400 border-dashed 0  text-white"
+                  class="flex m-1 justify-center items-center text-2xl h-20 w-14 rounded-md border-2 border-purple-400 border-dashed 0 text-white"
                 />
               {/each}
             {/if}
@@ -258,10 +303,13 @@
           {#each room.membersInfo as member, i (member.clientId)}
             <li>
               <p>
-                {member.name} -
-                <Badge type={member.voted ? "success" : "warning"}
-                  >{member.voted ? "Voted" : "Pending"}</Badge
-                >
+                {member.name} ({member.participant})
+                {#if member.participant === "Voter"}
+                  -
+                  <Badge type={member.voted ? "success" : "warning"}
+                    >{member.voted ? "Voted" : "Pending"}</Badge
+                  >
+                {/if}
               </p>
             </li>
           {/each}

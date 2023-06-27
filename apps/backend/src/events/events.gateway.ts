@@ -190,7 +190,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   };
 
-  updateName = (client, { id, name }) => {
+  updateName = (client, { id, name, participant }) => {
     const room = this.findRoom(id);
     if (room) {
       const updatedRoom = {
@@ -200,6 +200,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           {
             clientId: client.id,
             name,
+            participant,
           },
         ],
       };

@@ -40,3 +40,6 @@ Thumbs.db
 
 .env
 .turbo
+
+/~
+/apps/*/~
