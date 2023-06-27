@@ -77,7 +77,6 @@
 
   let toggleRevealed = () => {
     socket.emit("events", { type: "reveal", payload: { id: roomId } });
-    console.log(selectedEstimates, filteredMembers);
   };
 
   let reset = () => {
