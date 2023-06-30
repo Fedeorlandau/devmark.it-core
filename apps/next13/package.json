@@ -1,0 +1,32 @@
+{
+  "name": "next13",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "turbo": "next dev --turbo",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@types/node": "18.11.9",
+    "@types/react": "18.0.24",
+    "@types/react-dom": "18.0.8",
+    "clsx": "^1.2.1",
+    "js-cookie": "^3.0.1",
+    "next": "13.0.1",
+    "next-themes": "^0.2.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "socket.io-client": "^4.5.3",
+    "typescript": "4.8.4",
+    "zustand": "^4.1.4"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.2",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.18",
+    "tailwindcss": "^3.2.1"
+  }
+}
