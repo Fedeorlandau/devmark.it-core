@@ -1,0 +1,5 @@
+{
+    "redirects": [
+        { "source": "/private/:path*", "destination": "/anon/:path*" }
+    ]
+}
