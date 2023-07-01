@@ -26,8 +26,6 @@ function Room({ id, type = "private" }: RoomProps) {
     toggleRevealed,
   } = useRoom((state) => state);
 
-  console.log(room);
-
   initSocket({
     id,
     onInitialized: () => {
@@ -45,7 +43,6 @@ function Room({ id, type = "private" }: RoomProps) {
   }, [socket, room, type, isJoined]);
 
   const onJoin = (memberName?: string, isVoter?: boolean) => {
-    console.log(isVoter);
     socket?.emit("events", {
       type: "update_name",
       payload: {

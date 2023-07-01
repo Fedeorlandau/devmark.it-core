@@ -16,7 +16,7 @@ interface RoomContentProps {
   isOwner: boolean;
 }
 function RoomContent({ vote, reset, isOwner, reveal }: RoomContentProps) {
-  const { room, voted, name, participant } = useRoom((state) => state);
+  const { room, voted, name } = useRoom((state) => state);
 
   const selectedEstimates = useMemo(
     () => room?.selectedOptions.sort((a, b) => a.value - b.value),
@@ -24,9 +24,13 @@ function RoomContent({ vote, reset, isOwner, reveal }: RoomContentProps) {
   );
 
   const total = useMemo(
-    () => room?.members?.length ?? 0,
-    [room?.members.length]
+    () =>
+      room?.membersInfo.filter((member) => member.participant === "Voter")
+        .length ?? 0,
+    [room?.membersInfo.length]
   );
+
+  console.log(total);
 
   const averageEstimates = useMemo(() => {
     if (!selectedEstimates?.length) {
