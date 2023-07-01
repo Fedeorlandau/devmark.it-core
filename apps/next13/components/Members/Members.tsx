@@ -1,7 +1,6 @@
 import Badge from "@/components/Badge";
 import { MemberInfo } from "@/types/index";
 
-
 interface MembersProps {
   members?: MemberInfo[];
 }
@@ -16,10 +15,16 @@ function Members({ members }: MembersProps) {
         {members?.map((member) => (
           <li key={member.clientId}>
             <p>
-              {member.name} - {" "}
-              <Badge type={member.voted ? "success" : "warning"}>
-                {member.voted ? "Voted" : "Pending"}
-              </Badge>
+              {member.name}
+              {member.participant === "Voter" ? (
+                <>
+                  {" "}
+                  -{" "}
+                  <Badge type={member.voted ? "success" : "warning"}>
+                    {member.voted ? "Voted" : "Pending"}
+                  </Badge>
+                </>
+              ) : null}
             </p>
           </li>
         ))}

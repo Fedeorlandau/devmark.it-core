@@ -3,7 +3,7 @@
 import initSocket from "@/hooks/initSocket";
 import ExpiredMessage from "@/components/ExpiredMessage";
 import InputName from "@/components/InputName";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import Loader from "@/components/Loader";
 import RoomContent from "@/components/RoomContent";
 import { useRoom } from "@/stores/useRoom";
@@ -16,8 +16,17 @@ interface RoomProps {
 
 function Room({ id, type = "private" }: RoomProps) {
   const { isExpired, isJoined, socket } = useSocket((state) => state);
-  const { room, setName, setRoom, setVoted, clearRoom, toggleRevealed } =
-    useRoom((state) => state);
+  const {
+    room,
+    setName,
+    setParticipant,
+    setRoom,
+    setVoted,
+    clearRoom,
+    toggleRevealed,
+  } = useRoom((state) => state);
+
+  console.log(room);
 
   initSocket({
     id,
@@ -35,12 +44,18 @@ function Room({ id, type = "private" }: RoomProps) {
     }
   }, [socket, room, type, isJoined]);
 
-  const onJoin = (memberName?: string) => {
+  const onJoin = (memberName?: string, isVoter?: boolean) => {
+    console.log(isVoter);
     socket?.emit("events", {
       type: "update_name",
-      payload: { id, name: memberName },
+      payload: {
+        id,
+        name: memberName,
+        participant: isVoter ? "Voter" : "Spectator",
+      },
     });
     setName(memberName);
+    setParticipant(isVoter ? "Voter" : "Spectator");
   };
 
   const vote = (estimate: number) => {

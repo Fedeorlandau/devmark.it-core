@@ -7,6 +7,7 @@ import EstimatesList from "@/components/EstimatesList";
 import { useMemo } from "react";
 import EstimatesAverage from "@/components/EstimatesAverage";
 import Members from "@/components/Members";
+import { cn } from "lib/utils";
 
 interface RoomContentProps {
   vote: (estimate: number) => void;
@@ -15,7 +16,7 @@ interface RoomContentProps {
   isOwner: boolean;
 }
 function RoomContent({ vote, reset, isOwner, reveal }: RoomContentProps) {
-  const { room, voted, name } = useRoom((state) => state);
+  const { room, voted, name, participant } = useRoom((state) => state);
 
   const selectedEstimates = useMemo(
     () => room?.selectedOptions.sort((a, b) => a.value - b.value),
@@ -51,7 +52,7 @@ function RoomContent({ vote, reset, isOwner, reveal }: RoomContentProps) {
               voted={voted}
               vote={vote}
             />
-            {isOwner && <Controls reset={reset} reveal={reveal}/>}
+            {isOwner && <Controls reset={reset} reveal={reveal} />}
           </div>
         </div>
 
@@ -60,7 +61,10 @@ function RoomContent({ vote, reset, isOwner, reveal }: RoomContentProps) {
             Team estimates
           </h2>
           <div
-            className={`flex flex-wrap ${!room?.revealed ? "opacity-50" : ""}`}
+            className={cn(
+              "flex flex-wrap",
+              !room?.revealed ? "opacity-50" : ""
+            )}
           >
             <EstimatesList
               estimates={selectedEstimates}
@@ -74,7 +78,7 @@ function RoomContent({ vote, reset, isOwner, reveal }: RoomContentProps) {
           />
         </div>
       </div>
-      <Members members={room?.membersInfo}/>
+      <Members members={room?.membersInfo} />
     </>
   );
 }

@@ -1,10 +1,12 @@
+import { cn } from "lib/utils";
 import { useState } from "react";
 
 interface InputNameProps {
-  onJoin: (name?: string) => void;
+  onJoin: (name?: string, isVoter?: boolean) => void;
 }
 function InputName({ onJoin }: InputNameProps) {
   const [name, setName] = useState<string>();
+  const [isVoter, setIsVoter] = useState<boolean>(true);
 
   return (
     <>
@@ -33,12 +35,36 @@ function InputName({ onJoin }: InputNameProps) {
                       className="p-2 text-black shadow-sm focus:ring-pink-700 focus:outline-none border-pink-500 border focus:border-pink-700 block w-full sm:text-sm rounded-md"
                     />
                   </div>
+                  <div className="border shadow-md rounded-md flex space-between mt-2 bg-gray-200">
+                    <button
+                      onClick={() => setIsVoter(true)}
+                      className={cn(
+                        "w-full px-2 py-1 rounded-md transition-colors duration-100",
+                        isVoter
+                          ? "bg-indigo-600 text-white"
+                          : "bg-gray-200 text-black"
+                      )}
+                    >
+                      Voter
+                    </button>
+                    <button
+                      onClick={() => setIsVoter(false)}
+                      className={cn(
+                        "w-full px-2 py-1 rounded-md transition-colors duration-100",
+                        !isVoter
+                          ? "bg-indigo-600 text-white"
+                          : "bg-gray-200 text-black"
+                      )}
+                    >
+                      Spectator
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="mt-5 sm:mt-6">
+              <div className="mt-4 sm:mt-6">
                 <button
                   type="button"
-                  onClick={() => onJoin(name)}
+                  onClick={() => onJoin(name, isVoter)}
                   className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
                 >
                   Join the room

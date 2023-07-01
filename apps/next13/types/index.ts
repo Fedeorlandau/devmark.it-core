@@ -4,10 +4,13 @@ export interface OptionPack {
   values: number[];
 }
 
+export type Participant = "Voter" | "Spectator";
+
 export interface MemberInfo {
   clientId: number;
   name: string;
   voted?: boolean;
+  participant: Participant;
 }
 
 export interface Room {
