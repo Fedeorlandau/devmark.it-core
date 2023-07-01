@@ -1,15 +1,13 @@
-import Room from '@/components/Room'
+import Room from "@/components/Room";
 
-interface PrivateEstimatePageProps  {
+interface PrivateEstimatePageProps {
   params: {
     room: string;
-  }
+  };
 }
 
-function PrivateEstimatePage({params: { room }}: PrivateEstimatePageProps) {
-  return (
-      <Room id={room} type="anon"/>
-  )
+function PrivateEstimatePage({ params: { room } }: PrivateEstimatePageProps) {
+  return <Room id={room} type="anon" />;
 }
 
-export default PrivateEstimatePage
+export default PrivateEstimatePage;
