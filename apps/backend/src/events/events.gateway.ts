@@ -49,12 +49,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     new InMemoryDBService<RoomEntity>({ featureName: "rooms" });
   private readonly logger = new Logger(EventsGateway.name);
 
-  @Cron("*/5 * * * *")
+  @Cron("0 */30 * * * *")
   handleCron(): void {
     this.logger.debug("Running cleanup cron");
     const time = new Date();
     const rooms = this.roomService.query((room) => {
-      return room.createdAt.getTime() + HOUR < time.getTime();
+      return room.createdAt.getTime() + HOUR * 2 < time.getTime();
     });
     if (rooms.length > 0) {
       this.logger.debug(
